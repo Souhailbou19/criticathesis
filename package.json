@@ -1,0 +1,109 @@
+{
+  "name": "critical-thinking-extension",
+  "displayName": "Critical Thinking Extension",
+  "description": "Prompts students to reflect before getting code suggestions for TypeScript tasks.",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.105.0"
+  },
+  "categories": ["Education", "Other"],
+  "activationEvents": [
+    "onStartupFinished",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onCommand:ct.reflect.selection",
+    "onCommand:ct.suggest.solution",
+    "onCommand:ct.toggle.gating"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "ct.reflect.selection",
+        "title": "CT: Reflect on Current Task"
+      },
+      {
+        "command": "ct.suggest.solution",
+        "title": "CT: Suggest Solution (Guarded)"
+      },
+      {
+        "command": "ct.toggle.gating",
+        "title": "CT: Toggle Gating Mode (off/soft/hard)"
+      }
+    ],
+    "configuration": {
+      "title": "Critical Thinking Extension",
+      "properties": {
+        "ct.questions.template": {
+          "type": "array",
+          "default": [
+            "What is the user story or requirement in one sentence?",
+            "Define input types and the exact output (function signature, return type).",
+            "List at least 3 edge cases (empty, null/undefined, out-of-range, i18n, timezones).",
+            "What invariants or constraints must always hold?",
+            "How will you test this (unit cases, properties, error paths)?"
+          ],
+          "markdownDescription": "Reflection questions shown before suggestions."
+        },
+        "ct.gating.mode": {
+          "type": "string",
+          "enum": ["off", "soft", "hard"],
+          "default": "hard",
+          "markdownDescription": "off = no gate; soft = warn if no recent reflection; hard = require reflection before CT suggestions."
+        },
+        "ct.gating.windowMinutes": {
+          "type": "number",
+          "default": 20,
+          "markdownDescription": "How long a reflection stays valid for the current file."
+        },
+        "ct.llm.openaiModel": {
+          "type": "string",
+          "default": "gpt-4o-mini",
+          "markdownDescription": "OpenAI model ID to use for code alternatives aka gpt-4o-mini"
+        },
+        "ct.llm.maxContextChars": {
+          "type": "number",
+          "default": 8000,
+          "markdownDescription": "Max characters of file content to send as context to the LLM."
+        },
+        "ct.llm.apiKey": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Optional override for the OpenAI API key."
+        },
+        "ct.llm.useFake": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Fake alternatives if true. Set to false to actually call the OpenAI API."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.105.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
+    "eslint": "^9.36.0",
+    "esbuild": "^0.25.10",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
