@@ -136,13 +136,12 @@ export async function suggestSolution(policy: Policy): Promise<void> {
     },
   }).catch(console.error);
 
-  // --- Insert chosen alternative into the (still-open) editor ---
+ 
    const targetDoc = await vscode.workspace.openTextDocument(doc.uri);
   const targetEditor = await vscode.window.showTextDocument(targetDoc, {
     preview: false,
   });
 
-  // Optional: insert at the current cursor in that document
   const insertAt = targetEditor.selection.active;
   const snippet = new vscode.SnippetString(chosen.code);
 
